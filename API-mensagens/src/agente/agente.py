@@ -18,14 +18,25 @@ def processar_mensagem(mensagem, nome):
     # Decidir resposta
     if quantidade == 0:
         return f"Oi {nome}, como posso te ajudar?"
-    else:
-        return "Ainda estou aprendendo, mas vou tentar te ajudar!"
+    
+    else: 
+         resposta = gerar_resposta_ai(mensagem)
+
+         return resposta
+         
+def gerar_resposta_ai(mensagem):
+
+        resposta = "Ainda estou aprendendo, mas posso tentar ajudar"
+
+        return resposta
     
 
     
 if __name__ == "__main__":
     resposta = processar_mensagem("oi", "Ana")
     print(resposta)
+
+
     
     
    
