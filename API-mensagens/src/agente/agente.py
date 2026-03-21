@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from ia_service import gerar_resposta
 
 def processar_mensagem(mensagem, nome):
  
@@ -20,15 +21,21 @@ def processar_mensagem(mensagem, nome):
         return f"Oi {nome}, como posso te ajudar?"
     
     else: 
-         resposta = gerar_resposta_ai(mensagem)
-
+         resposta = gerar_resposta(mensagem)
          return resposta
          
-def gerar_resposta_ai(mensagem):
 
-        resposta = "Ainda estou aprendendo, mas posso tentar ajudar"
 
-        return resposta
+
+def responder_bot(mensagem):
+
+    resposta = gerar_resposta(mensagem["text"])
+
+    return {
+        "from": "bot",
+        "to": mensagem["from"],
+        "text": resposta
+    }
     
 
     
