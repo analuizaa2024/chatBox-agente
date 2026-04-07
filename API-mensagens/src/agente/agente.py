@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from ia_service import gerar_resposta
+from src.agente.ia_service import gerar_resposta
 
 def processar_mensagem(mensagem, nome):
  
@@ -39,9 +39,9 @@ def responder_bot(mensagem):
     
 
     
-if __name__ == "__main__":
-    resposta = processar_mensagem("oi", "Ana")
-    print(resposta)
+#if __name__ == "__main__":
+ #   resposta = processar_mensagem("oi", "Laerte")
+  #  print(resposta)
 
 
     

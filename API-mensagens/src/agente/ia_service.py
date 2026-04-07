@@ -1,8 +1,9 @@
 import requests
 
-API_KEY = "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"
+API_KEY = "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"
 
 def gerar_resposta(pergunta):
+   
 
     url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -12,7 +13,7 @@ def gerar_resposta(pergunta):
     }
 
     payload = {
-        "model": "mistralai/mistral-7b-instruct",
+        "model": "openai/gpt-3.5-turbo",
         "messages": [
             {
                 "role": "user",
@@ -22,7 +23,10 @@ def gerar_resposta(pergunta):
     }
 
     response = requests.post(url, headers=headers, json=payload)
+    
 
     data = response.json()
+    print("RESPOSTA DA API:")
+    print(data)
 
     return data["choices"][0]["message"]["content"]
