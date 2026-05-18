@@ -37,7 +37,7 @@ def error_response(code, message):
 
 # ROTAS PRINCIPAIS
 
-@ns.route('/allMesages')
+@ns.route('/allMessages')
 class Mensagens(Resource):
 
     # -------------------- GET --------------------
@@ -58,51 +58,69 @@ class Mensagens(Resource):
         except Exception as e:
             return error_response(500, f"Erro ao buscar mensagens: {str(e)}")
 
-    # -------------------- POST --------------------
+   
+# -------------------- POST --------------------
 
     @ns.expect(mensagem_model)
-    @ns.marshal_with(mensagem_model)
+    # @ns.marshal_with(mensagem_model)
     @ns.response(201, "Mensagem criada")
     @ns.response(400, "Dados inválidos", error_model)
     @ns.response(500, "Erro interno", error_model)
-
     def post(self):
         """Adicionar uma nova mensagem"""
         try:
             nova = api.payload
 
-        # Validar campos obrigatórios
+            # Validar campos obrigatórios
             if not nova.get("user") or not nova.get("msg") or not nova.get("to"):
-                return error_response(400, "Campos obrigatórios faltando: user, msg, to")
+                return error_response(
+                    400,
+                    "Campos obrigatórios faltando: user, msg, to"
+                )
 
-        # Pegar dados da mensagem
+            # Pegar dados da mensagem
             nome = nova["user"]
             mensagem = nova["msg"]
 
-        # Inserir mensagem do usuário no MongoDB
+            # Inserir mensagem do usuário no MongoDB
             resultado = collection.insert_one(nova)
             nova["id"] = str(resultado.inserted_id)
 
-        # Se a mensagem for para o atendente (bot)
-            if nova["to"] == "atendente":
+            # Remover _id caso exista
+            nova.pop("_id", None)
 
-            # Chamar o agente
+            # Se a mensagem for para o atendente (bot)
+            if nova["to"] == "atendente":
+                print("ENTROU NO BOT")
+
+                # Chamar o agente
                 resposta = processar_mensagem(mensagem, nome)
 
-            # Criar mensagem do bot
+                # Criar mensagem do bot
                 msg_bot = {
                     "user": "atendente",
                     "msg": resposta,
                     "to": nome
-            }
+                }
 
-            # Salvar resposta do bot
-            collection.insert_one(msg_bot)
+                # Salvar resposta do bot
+                resultado_bot = collection.insert_one(msg_bot)
+                msg_bot["id"] = str(resultado_bot.inserted_id)
+                msg_bot.pop("_id", None)
 
+                return {
+                    "mensagem_usuario": nova,
+                    "resposta_bot": msg_bot
+                }, 201
+
+            # Caso a mensagem não seja para o bot
             return nova, 201
 
         except Exception as e:
-            return error_response(500, f"Erro ao criar mensagem: {str(e)}")
+            return error_response(
+                500,
+                f"Erro ao criar mensagem: {str(e)}"
+            )
 
             
 

@@ -1,16 +1,21 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-API_KEY = "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"
+load_dotenv()
 
+API_KEY = os.getenv("API_KEY")
 def gerar_resposta(pergunta):
    
 
-    url = "https://openrouter.ai/api/v1/chat/completions"
-
+    url = os.getenv("OPENROUTER_URL")
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
+
+    print("API_KEY carregada?", API_KEY is not None)
+    print("URL:", url)
 
     payload = {
         "model": "openai/gpt-3.5-turbo",
@@ -28,5 +33,8 @@ def gerar_resposta(pergunta):
     data = response.json()
     print("RESPOSTA DA API:")
     print(data)
+
+    if "choices" not in data:
+        return f"Erro na API: {data}"
 
     return data["choices"][0]["message"]["content"]

@@ -1,7 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import foto from "../img/fotoDePerfil.jpg"
-import robo from "../img/fotoRobo.jpg"
+import robo from "../img/fotorobo.jpg"
 import {useMediaQuery} from '@mui/material';
 
  

@@ -4,6 +4,9 @@ import ChatInput from "./components/ChatInput";
 import { useMediaQuery } from "@mui/material";
 import "./App.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+console.log("API_URL:", API_URL);
+
 function App() {
   const scrollMensagemRef = useRef(null);
   const [mensagens, setMensagens] = useState([]);
@@ -12,7 +15,7 @@ function App() {
 
   const isMobile = useMediaQuery("(max-width:500px)");
 
-  // Carrega só o nome do localStorage
+  // Carrega o nome do localStorage
   useEffect(() => {
     const nomeSalvo = localStorage.getItem("nome");
     if (nomeSalvo) {
@@ -20,19 +23,22 @@ function App() {
     }
   }, []);
 
-  // Busca histórico REAL no backend (1 vez ao entrar)
+  // Busca o histórico no backend
   useEffect(() => {
     if (!nome) return;
 
-    fetch(`http://localhost:5000/mensagens/allMesages`)
+    fetch(`${API_URL}/mensagens/allMessages`)
       .then((res) => res.json())
       .then((data) => {
         const msgsDoUsuario = data.filter(
           (msg) => msg.user === nome || msg.to === nome
         );
-      setMensagens(
-        msgsDoUsuario.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-      );
+
+        setMensagens(
+          msgsDoUsuario.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          )
+        );
       })
       .catch((err) => console.error("Erro ao carregar histórico:", err));
   }, [nome]);
@@ -42,7 +48,7 @@ function App() {
     scrollMensagemRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [mensagens]);
 
-  // ENVIA MENSAGEM
+  // Envia mensagem
   async function onclickbutton(textoDigitado) {
     const novaMensagem = {
       user: nome,
@@ -50,37 +56,38 @@ function App() {
       to: "atendente",
     };
 
-    // Adiciona no frontend imediatamente
+    // Mostra a mensagem imediatamente no frontend
     setMensagens((prev) => [...prev, novaMensagem]);
 
     try {
       // Salva no backend
-      await fetch("http://localhost:5000/mensagens/allMesages", {
+      await fetch(`${API_URL}/mensagens/allMessages`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(novaMensagem),
       });
 
-      } catch (err) {
-  console.error("Erro ao enviar mensagem:", err);
-}
+      // Recarrega todas as mensagens atualizadas
+      const res = await fetch(`${API_URL}/mensagens/allMessages`);
+      const data = await res.json();
 
-const res = await fetch("http://localhost:5000/mensagens/allMesages");
-const data = await res.json();
+      const msgsDoUsuario = data.filter(
+        (msg) => msg.user === nome || msg.to === nome
+      );
 
-const msgsDoUsuario = data.filter(
-  (msg) => msg.user === nome || msg.to === nome
-);
-
-setMensagens(
-  msgsDoUsuario.sort(
-    (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-  )
-);
-
+      setMensagens(
+        msgsDoUsuario.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        )
+      );
+    } catch (err) {
+      console.error("Erro ao enviar mensagem:", err);
+    }
   }
 
-    return (
+  return (
     <div
       className={`w-screen h-screen flex flex-col bg-sky-100 ${
         isMobile ? "p-2" : "p-6"
@@ -91,7 +98,7 @@ setMensagens(
         nome={nome}
         typing={typing}
         scrollMensagemRef={scrollMensagemRef}
-         isMobile={isMobile}
+        isMobile={isMobile}
       />
 
       <ChatInput onSend={onclickbutton} />
