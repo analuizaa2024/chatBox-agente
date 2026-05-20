@@ -18,7 +18,7 @@ def gerar_resposta(pergunta):
     print("URL:", url)
 
     payload = {
-        "model": "openai/gpt-3.5-turbo",
+        "model": "openai/gpt-4o-mini",
         "messages": [
             {
                 "role": "user",
@@ -28,6 +28,9 @@ def gerar_resposta(pergunta):
     }
 
     response = requests.post(url, headers=headers, json=payload)
+
+    print("STATUS CODE:", response.status_code)
+    print("RESPOSTA TEXTO:", response.text)
     
 
     data = response.json()
