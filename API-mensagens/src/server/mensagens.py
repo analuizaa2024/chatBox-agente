@@ -56,6 +56,12 @@ class Mensagens(Resource):
             return mensagens
 
         except Exception as e:
+            print("ERRO NO GET /allMessages:", e)
+
+            import traceback
+            traceback.print_exc()
+
+            
             return error_response(500, f"Erro ao buscar mensagens: {str(e)}")
 
    
