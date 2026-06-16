@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import reqparse, abort, Resource, fields
 from src.server.instance import server
-from src.server.raw import collection
+from src.server.raw import collection, users_collection
 from bson import ObjectId
 from flask_cors import CORS
 from src.agente.agente import processar_mensagem
@@ -21,6 +21,13 @@ mensagem_model = ns.model('Mensagem', {
     'msg': fields.String(required=True, description='Conteúdo da mensagem'),
     'to': fields.String(required=True, description='Destinatário'),
     'id': fields.String(description='ID da mensagem no banco')
+})
+
+usuario_model = ns.model('Usuario', {
+    'name': fields.String(required=True, description = 'Nome do usuário'),
+    'email': fields.String(required=True, description = 'Email do usuário'),
+    'photo': fields.String(required=True, description = 'Foto do usuário'),
+    'role': fields.String(required=True, description = 'Cargo do usuário')
 })
 
 # Modelo para erros no Swagger
@@ -181,5 +188,86 @@ class Mensagem(Resource):
 
         except Exception as e:
             return error_response(500, f"Erro ao deletar mensagem: {str(e)}")
+        
+    @ns.route('/user')
+    class Usuario(Resource):
+
+        def get(self):
+            usuarios = list(users_collection.find({}))
+
+            for u in usuarios:
+                u["id"] = str(u.pop("_id"))
+
+            return usuarios 
+
+        @ns.expect(usuario_model)
+        def post(self):
+
+            novo_usuario = api.payload
+
+            if not novo_usuario.get("name") or not novo_usuario.get("email"):
+                return {
+                    "status": "error",
+                    "message": "Campos obrigatórios: name e email"
+                }, 400
+            
+            resultado = users_collection.insert_one(novo_usuario)
+
+            novo_usuario["id"] = str(resultado.inserted_id)
+
+            novo_usuario.pop("_id", None)
+
+            return novo_usuario, 201
+        
+
+    @ns.route('/user/<string:id>')
+    class UsuarioId(Resource): 
+
+        @ns.expect(usuario_model)
+        def put(self, id):
+
+            # Verifica se o ID é válido
+            if not ObjectId.is_valid(id):
+                return error_response(400, "ID inválido.")
+
+            dados = api.payload
+
+            try:
+                resultado = users_collection.update_one(
+                    {"_id": ObjectId(id)},
+                    {"$set": dados}
+                )   
+
+                if resultado.matched_count == 0:
+                    return error_response(404, "Usuário não encontrado.")
+                
+                dados["id"] = id
+
+                return dados
+            except Exception as e:
+                return error_response(500, f"Erro ao atualizar: {str(e)}")
+            
+
+        def delete(self, id):
+
+             if not ObjectId.is_valid(id):
+                return error_response(400, "ID inválido.")
+
+             try:
+                resultado = users_collection.delete_one(
+                   {"_id": ObjectId(id)}
+                )
+
+                if resultado.deleted_count == 0:
+                    return error_response(404, "Usuário não encontrado.")
+
+                return {
+                   "status": "success",
+                    "message": "Usuário removido com sucesso",
+                    "id": id
+                }
+
+             except Exception as e:
+              return error_response(500, f"Erro ao deletar: {str(e)}")    
         
 

@@ -6,6 +6,9 @@ connection_string = "mongodb+srv://AnaLuiza:AnaLuiza@cluster0.elo3l5s.mongodb.ne
 client = MongoClient(connection_string)
 db_connection = client["ChatBot"]
 
+collection =db_connection.get_collection("mensagens")
+users_collection = db_connection.get_collection("user")
+
 print(db_connection)
 print()
 collection = db_connection.get_collection("mensagens")

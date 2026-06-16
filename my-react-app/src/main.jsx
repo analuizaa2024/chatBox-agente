@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPages from "./pages/LoginPages.jsx";
+import Perfil from "./pages/Perfil.jsx";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,11 @@ const router = createBrowserRouter([
   {
     path: "/chat",
     element: <App />,
+  },
+
+  {
+    path: "/perfil",
+    element: <Perfil />,
   },
 ]);
 

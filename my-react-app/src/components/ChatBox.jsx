@@ -25,7 +25,8 @@ function ChatBox({ mensagens = [], nome = "", typing = false, scrollMensagemRef 
            src={foto} 
            alt="um foto que o usuario irá poder colocar caso ele queira" 
            title="sua foto" 
-           className="w-10 h-10 rounded-full object-cover"/>
+           className="w-10 h-10 rounded-full object-cover"
+           onClick={() => navigate("/perfil")}/>
 
           <h1 className="">{nome}</h1>
 
