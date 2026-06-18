@@ -1,7 +1,34 @@
+import { useState, useEffect } from "react";
 import foto from "../img/fotoDePerfil.jpg";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Perfil() {
+  const [usuario, setUsuario] = useState(null);
+
   const nome = localStorage.getItem("nome");
+
+  useEffect(() => {
+    if (!nome) return;
+
+    fetch(`${API_URL}/mensagens/user`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Dados da API:", data);
+
+      const usuarioEncontrado = data.find(
+        (u) => u.name === nome
+      );
+
+      console.log("Usuário encontrado:", usuarioEncontrado);
+
+      setUsuario(usuarioEncontrado);
+    })
+    .catch((err) =>
+       console.error("Erro ao buscar usuário:", err)
+  );
+  }, [nome]);
+  
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center bg-sky-100">
@@ -23,11 +50,11 @@ function Perfil() {
           </div>
 
           <div className="bg-sky-200 p-4 rounded-xl">
-            <p>Email: ana@email.com</p>
+            <p>Email: {usuario?.email}</p>
           </div>
 
           <div className="bg-sky-200 p-4 rounded-xl">
-            <p>Cargo: User</p>
+            <p>Cargo:{usuario?.role}</p>
           </div>
         </div>
       </div>
