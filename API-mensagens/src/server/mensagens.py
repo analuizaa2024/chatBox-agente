@@ -5,12 +5,14 @@ from src.server.raw import collection, users_collection
 from bson import ObjectId
 from flask_cors import CORS
 from src.agente.agente import processar_mensagem
+print("MENSAGENS IMPORTADO")
 
 # Ativar CORS
 CORS(server.app)
 
 # Acessar namespace e api criados no instance.py
 ns = server.ns_mensagens
+ns_users = server.api.namespace('users', description='Operações de usuários')
 api = server.api
 
 # MODELOS DO SWAGGER
@@ -23,11 +25,12 @@ mensagem_model = ns.model('Mensagem', {
     'id': fields.String(description='ID da mensagem no banco')
 })
 
-usuario_model = ns.model('Usuario', {
+usuario_model = ns_users.model('Usuario', {
     'name': fields.String(required=True, description = 'Nome do usuário'),
     'email': fields.String(required=True, description = 'Email do usuário'),
     'photo': fields.String(required=True, description = 'Foto do usuário'),
-    'role': fields.String(required=True, description = 'Cargo do usuário')
+    'role': fields.String(required=True, description = 'Cargo do usuário'),
+    'password': fields.String(required=True, description = 'Senha do usuário'),
 })
 
 # Modelo para erros no Swagger
@@ -189,8 +192,13 @@ class Mensagem(Resource):
         except Exception as e:
             return error_response(500, f"Erro ao deletar mensagem: {str(e)}")
         
-    @ns.route('/user')
-    class Usuario(Resource):
+
+# ROTAS PRINCIPAIS
+
+#---------------------- GET DO USUÁRIO -----------------------------
+        
+@ns_users.route('/')
+class Usuario(Resource):
 
         def get(self):
             usuarios = list(users_collection.find({}))
@@ -199,29 +207,33 @@ class Mensagem(Resource):
                 u["id"] = str(u.pop("_id"))
 
             return usuarios 
+        
+# ------------------------------ POST DE USUÁRIO ---------------------------------        
 
         @ns.expect(usuario_model)
         def post(self):
 
             novo_usuario = api.payload
 
-            if not novo_usuario.get("name") or not novo_usuario.get("email"):
+            if not novo_usuario.get("name") or not novo_usuario.get("email") or not novo_usuario.get("password"):
                 return {
                     "status": "error",
-                    "message": "Campos obrigatórios: name e email"
+                    "message": "Campos obrigatórios: name, email e password"
                 }, 400
             
             resultado = users_collection.insert_one(novo_usuario)
 
             novo_usuario["id"] = str(resultado.inserted_id)
 
-            novo_usuario.pop("_id", None)
+           
 
             return novo_usuario, 201
         
 
-    @ns.route('/user/<string:id>')
-    class UsuarioId(Resource): 
+# ---------------------- PUT DO USUARIO -----------------------------      
+
+@ns_users.route('/<string:id>')
+class UsuarioId(Resource): 
 
         @ns.expect(usuario_model)
         def put(self, id):

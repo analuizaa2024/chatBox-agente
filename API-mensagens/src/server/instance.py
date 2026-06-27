@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restx import Api, Namespace
+print("INSTANCE IMPORTADO")
 
 class Server:
     def __init__(self):

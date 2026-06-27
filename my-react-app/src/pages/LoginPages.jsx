@@ -34,6 +34,11 @@ function LoginPages() {
          handleLoginClick ();
           }}
         className="bg-slate-300 p-2 rounded-md w-75 border">Entrar</button>
+
+
+        <button 
+         onClick={() => navigate("/cadastro")}
+         className="bg-slate-300 p-2 rounded-md w-75 border">Criar Conta</button>
         
         </div>
       

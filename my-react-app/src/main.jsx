@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPages from "./pages/LoginPages.jsx";
 import Perfil from "./pages/Perfil.jsx";
+import CadastroPage from "./pages/CadastroPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,11 @@ const router = createBrowserRouter([
   {
     path: "/perfil",
     element: <Perfil />,
+  },
+
+  {
+    path: "/cadastro",
+    element: <CadastroPage />,
   },
 ]);
 
