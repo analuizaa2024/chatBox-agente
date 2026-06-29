@@ -65,7 +65,14 @@ function validarFormulario() {
     return valido;
 }  
 
-function criarConta () {
+async function criarConta () {
+    const usuario = {
+        name: nome,
+        email: email,
+        password: senha
+    }
+
+
     if (!validarFormulario ())
     {
         setSucesso("");
