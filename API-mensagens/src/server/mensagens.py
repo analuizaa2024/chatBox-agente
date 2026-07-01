@@ -215,6 +215,23 @@ class Usuario(Resource):
 
             novo_usuario = api.payload
 
+            novo_usuario["role"] = "Usuário"
+            novo_usuario["photo"] = ""
+
+            usuario_existente = users_collection.find_one({
+                "email": novo_usuario["email"]
+            })
+
+            if usuario_existente:
+                return {
+                    "status": "error",
+                    "message": "esse email já existe"
+
+            }, 400
+
+            resultado = users_collection.insert_one(novo_usuario)
+             
+
             if not novo_usuario.get("name") or not novo_usuario.get("email") or not novo_usuario.get("password"):
                 return {
                     "status": "error",

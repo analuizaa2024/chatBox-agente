@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
+import axios from "axios";
+
 
 
 function CadastroPage() {
+
+    const USER_API_URL = import.meta.env.VITE_USERS_API_URL;
 
     const navigate = useNavigate();
 
@@ -19,6 +23,8 @@ function CadastroPage() {
     });
 
     const [sucesso, setSucesso] = useState("");
+
+    const [erroApi, setErroApi] = useState("");
 
 
 function validarFormulario() {
@@ -66,18 +72,27 @@ function validarFormulario() {
 }  
 
 async function criarConta () {
-    const usuario = {
-        name: nome,
-        email: email,
-        password: senha
-    }
-
 
     if (!validarFormulario ())
     {
         setSucesso("");
         return;
     }
+
+    const usuario = {
+        user_name: nome,
+        user_email: email,
+        user_password: senha
+    }
+
+    setErroApi("");
+    setSucesso("");
+    
+
+    try {
+        const resposta = await axios.post(USER_API_URL, usuario);
+
+        console.log(resposta.data);
 
     setNome("");
     setEmail("");
@@ -92,6 +107,11 @@ async function criarConta () {
     });
 
     setSucesso("Conta criada com sucesso!");
+
+    } catch (error) {
+        const mensagem = error.response?.data?.message;
+        setErroApi(mensagem || "erro ao criar conta");
+    }
 }
 
     return (
@@ -102,6 +122,12 @@ async function criarConta () {
                 <h1 className="text-2xl font-bold text-center mb-6">
                     Criar Conta
                 </h1>
+
+                {erroApi && (
+                    <p className="text-red-600 text-center mb-4">
+                        {erroApi}
+                    </p>
+                )}
 
                 {sucesso && (
                     <p className="text-green-600 text-center mb-4">
