@@ -80,9 +80,9 @@ async function criarConta () {
     }
 
     const usuario = {
-        user_name: nome,
-        user_email: email,
-        user_password: senha
+        name: nome,
+        email: email,
+        password: senha
     }
 
     setErroApi("");
@@ -109,6 +109,8 @@ async function criarConta () {
     setSucesso("Conta criada com sucesso!");
 
     } catch (error) {
+        console.log(error);
+        
         const mensagem = error.response?.data?.message;
         setErroApi(mensagem || "erro ao criar conta");
     }

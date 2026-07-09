@@ -15,7 +15,7 @@ ns = server.ns_mensagens
 ns_users = server.api.namespace('users', description='Operações de usuários')
 api = server.api
 
-# MODELOS DO SWAGGER
+#  catch MODELOS DO SWAGGER
 
 # Modelo padrão para mensagens
 mensagem_model = ns.model('Mensagem', {
@@ -31,6 +31,11 @@ usuario_model = ns_users.model('Usuario', {
     'photo': fields.String(required=True, description = 'Foto do usuário'),
     'role': fields.String(required=True, description = 'Cargo do usuário'),
     'password': fields.String(required=True, description = 'Senha do usuário'),
+})
+
+login_model = ns_users.model('Login', {
+    'email': fields.String(required=True, description='Email do usuário'),
+    'password': fields.String(required=True, description='Senha do usuário'),
 })
 
 # Modelo para erros no Swagger
@@ -215,6 +220,12 @@ class Usuario(Resource):
 
             novo_usuario = api.payload
 
+            if not novo_usuario.get("name") or not novo_usuario.get("email") or not novo_usuario.get("password"):
+                return {
+                    "status": "error",
+                    "message": "Campos obrigatórios: name, email e password"
+                }, 400
+
             novo_usuario["role"] = "Usuário"
             novo_usuario["photo"] = ""
 
@@ -228,19 +239,12 @@ class Usuario(Resource):
                     "message": "esse email já existe"
 
             }, 400
-
-            resultado = users_collection.insert_one(novo_usuario)
-             
-
-            if not novo_usuario.get("name") or not novo_usuario.get("email") or not novo_usuario.get("password"):
-                return {
-                    "status": "error",
-                    "message": "Campos obrigatórios: name, email e password"
-                }, 400
             
             resultado = users_collection.insert_one(novo_usuario)
 
             novo_usuario["id"] = str(resultado.inserted_id)
+
+            novo_usuario.pop("_id", None)
 
            
 
@@ -297,6 +301,55 @@ class UsuarioId(Resource):
                 }
 
              except Exception as e:
-              return error_response(500, f"Erro ao deletar: {str(e)}")    
+              return error_response(500, f"Erro ao deletar: {str(e)}")   
+
+
+# -------------------------------------- ROTA DE LOGIN -------------------------------
+@ns_users.route('/login')
+class Login(Resource):
+
+    @ns_users.expect(login_model)
+    def post(self):
+
+        dados = api.payload
+
+        email = dados.get("email")
+        password = dados.get("password")
+
+        if not email or not password:
+            return {
+                "status": "error",
+                "message": "Email e senha são obrigatórios"
+            }, 400     
+        
+
+        usuario = users_collection.find_one({
+            "email": email
+        })
+
+        if not usuario:
+            return {
+                "status": "error",
+                "message": "Email ou senha inaválidos"
+            },400
+        
+        if usuario["password"] != password:
+            return {
+                "status":"error",
+                "message":"Email ou senha inválidos"
+            },400
+        
+        return {
+            "status":"sucess",
+            "message":"Login realizado com sucesso",
+            "usuario":{
+                "id": str(usuario["_id"]),
+                "name": usuario["name"],
+                "email": usuario["email"],
+                "role": usuario["role"]
+            }
+        },200
+
+
         
 
