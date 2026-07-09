@@ -3,11 +3,14 @@ import ChatBox from "./components/ChatBox";
 import ChatInput from "./components/ChatInput";
 import { useMediaQuery } from "@mui/material";
 import "./App.css";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 console.log("API_URL:", API_URL);
 
+
 function App() {
+  const navigate = useNavigate();
   const scrollMensagemRef = useRef(null);
   const [mensagens, setMensagens] = useState([]);
   const [nome, setNome] = useState("");
@@ -17,10 +20,15 @@ function App() {
 
   // Carrega o nome do localStorage
   useEffect(() => {
-    const nomeSalvo = localStorage.getItem("nome");
-    if (nomeSalvo) {
-      setNome(nomeSalvo);
+    const usuarioSalvo = localStorage.getItem("usuario");
+
+    if (!usuarioSalvo) {
+      navigate("/")
+      return;
     }
+      const usuario = JSON.parse(usuarioSalvo)
+      setNome(usuario.name);
+    
   }, []);
 
   // Busca o histórico no backend
