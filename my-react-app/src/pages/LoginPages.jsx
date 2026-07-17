@@ -1,13 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "./redux/userSlice";
 
 function LoginPages() {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
-     
     
 
   const navigate = useNavigate()
+
+  const dispatch = useDispatch()
   
     const handleLoginClick = async () => {
 
@@ -35,7 +38,8 @@ function LoginPages() {
         const data = await response.json();
 
         if (response.ok) {
-            console.log(data);
+            console.log(data)
+             dispatch(login(data.usuario));
 
             localStorage.setItem("usuario", JSON.stringify(data.usuario));
             localStorage.setItem("isLogged", "true")
