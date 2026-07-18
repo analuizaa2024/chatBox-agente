@@ -1,33 +1,13 @@
-import { useState, useEffect } from "react";
+
 import foto from "../img/fotoDePerfil.jpg";
+import { useSelector } from "react-redux";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Perfil() {
-  const [usuario, setUsuario] = useState(null);
 
-  const nome = localStorage.getItem("nome");
-
-  useEffect(() => {
-    if (!nome) return;
-
-    fetch(`${API_URL}/mensagens/user`)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Dados da API:", data);
-
-      const usuarioEncontrado = data.find(
-        (u) => u.name === nome
-      );
-
-      console.log("Usuário encontrado:", usuarioEncontrado);
-
-      setUsuario(usuarioEncontrado);
-    })
-    .catch((err) =>
-       console.error("Erro ao buscar usuário:", err)
-  );
-  }, [nome]);
+  const usuario = useSelector((state) => state.user.user)
+ 
   
 
   return (
