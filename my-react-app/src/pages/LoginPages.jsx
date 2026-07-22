@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { login } from "./redux/userSlice";
+import { login } from "../redux/userSlice";
 
 function LoginPages() {
    const [email, setEmail] = useState("");

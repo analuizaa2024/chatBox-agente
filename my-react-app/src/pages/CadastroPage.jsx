@@ -90,7 +90,9 @@ async function criarConta () {
     
 
     try {
-        const resposta = await axios.post(USER_API_URL, usuario);
+        const resposta = await axios.post(`${USER_API_URL}/users`,usuario);
+
+        console.log("USER_API_URL:", USER_API_URL);
 
         console.log(resposta.data);
 
@@ -211,7 +213,7 @@ async function criarConta () {
                 </div>
 
             </div>
-        </div>
+        </div>       
     );
 
 

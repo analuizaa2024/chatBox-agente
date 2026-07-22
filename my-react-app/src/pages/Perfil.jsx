@@ -1,13 +1,25 @@
 
 import foto from "../img/fotoDePerfil.jpg";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../redux/userSlice";
 
-const API_URL = import.meta.env.VITE_API_URL;
 
 function Perfil() {
 
   const usuario = useSelector((state) => state.user.user)
+
+  const dispatch = useDispatch();
  
+  const handleLogout = () => {
+    dispatch(logout());
+
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("isLogged");
+
+    Navigate("/");
+  }
   
 
   return (
@@ -26,7 +38,7 @@ function Perfil() {
 
         <div className="space-y-4 mt-6">
           <div className="bg-sky-200 p-4 rounded-xl">
-            <p>Nome: {nome}</p>
+            <p>Nome: {usuario?.name}</p>
           </div>
 
           <div className="bg-sky-200 p-4 rounded-xl">
@@ -34,8 +46,12 @@ function Perfil() {
           </div>
 
           <div className="bg-sky-200 p-4 rounded-xl">
-            <p>Cargo:{usuario?.role}</p>
+            <p>Cargo:{usuario?.role}</p>  
           </div>
+
+          <div>
+            <button className="bg-sky-300 p-4 rounded-xl" onClick={handleLogout}>Sair</button>
+            </div>
         </div>
       </div>
     </div>
