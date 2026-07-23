@@ -4,11 +4,16 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../redux/userSlice";
+import { useState } from "react";
 
 
 function Perfil() {
 
-  const usuario = useSelector((state) => state.user.user)
+  const [editando, setEditando] = useState(false);
+
+  const usuario = useSelector((state) => state.user.user);
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
  
@@ -18,8 +23,14 @@ function Perfil() {
     localStorage.removeItem("usuario");
     localStorage.removeItem("isLogged");
 
-    Navigate("/");
+    navigate("/");
   }
+
+  editando ? (
+    <input value={name} onChange={(e) => setName(e.target.value)} />
+  ) : (
+    <p>nome: {usuario?.name}</p>
+  )
   
 
   return (
@@ -51,6 +62,12 @@ function Perfil() {
 
           <div>
             <button className="bg-sky-300 p-4 rounded-xl" onClick={handleLogout}>Sair</button>
+            </div>
+
+            <div>
+              <button className="bg-sky-300 p-4 rounded-xl" onClick={() => setEditando(true)}> 
+              Editar Perfil
+              </button>
             </div>
         </div>
       </div>
