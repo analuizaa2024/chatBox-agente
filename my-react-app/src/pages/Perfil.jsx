@@ -9,6 +9,7 @@ import { useState } from "react";
 
 function Perfil() {
 
+  
   const [editando, setEditando] = useState(false);
 
   const usuario = useSelector((state) => state.user.user);
@@ -16,6 +17,9 @@ function Perfil() {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const [name, setName] = useState(usuario?.name);
+
  
   const handleLogout = () => {
     dispatch(logout());
@@ -26,11 +30,7 @@ function Perfil() {
     navigate("/");
   }
 
-  editando ? (
-    <input value={name} onChange={(e) => setName(e.target.value)} />
-  ) : (
-    <p>nome: {usuario?.name}</p>
-  )
+  
   
 
   return (
@@ -49,7 +49,11 @@ function Perfil() {
 
         <div className="space-y-4 mt-6">
           <div className="bg-sky-200 p-4 rounded-xl">
-            <p>Nome: {usuario?.name}</p>
+            {editando ? (
+    <input className=" bg-sky-400" value={name} onChange={(e) => setName(e.target.value)} />
+  ) : (
+    <p>nome: {usuario?.name}</p>
+  )}
           </div>
 
           <div className="bg-sky-200 p-4 rounded-xl">
@@ -61,14 +65,22 @@ function Perfil() {
           </div>
 
           <div>
-            <button className="bg-sky-300 p-4 rounded-xl" onClick={handleLogout}>Sair</button>
+            <button className="bg-sky-300 p-4 rounded-xl m-10" onClick={handleLogout}>Sair</button>
+
+            {editando ? (
+  <button  className="bg-sky-300 p-4 rounded-xl m-10" onClick={() => setEditando(false)}>
+    Salvar
+  </button>
+) : (
+  <button className="bg-sky-300 p-4 rounded-xl m-10" onClick={() => setEditando(true)}>
+    Editar Perfil
+  </button>
+)}
             </div>
 
-            <div>
-              <button className="bg-sky-300 p-4 rounded-xl" onClick={() => setEditando(true)}> 
-              Editar Perfil
-              </button>
-            </div>
+            
+              
+           
         </div>
       </div>
     </div>
